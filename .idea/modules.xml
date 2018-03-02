@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/management-portal.iml" filepath="$PROJECT_DIR$/.idea/modules/management-portal.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/management-portal-data.iml" filepath="$PROJECT_DIR$/.idea/modules/management-portal-data.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/management-portal-data_main.iml" filepath="$PROJECT_DIR$/.idea/modules/management-portal-data_main.iml" group="management-portal-data" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/management-portal-data_test.iml" filepath="$PROJECT_DIR$/.idea/modules/management-portal-data_test.iml" group="management-portal-data" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/management-portal_main.iml" filepath="$PROJECT_DIR$/.idea/modules/management-portal_main.iml" group="management-portal" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/management-portal_test.iml" filepath="$PROJECT_DIR$/.idea/modules/management-portal_test.iml" group="management-portal" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/move-fast-and-dont-break-things.iml" filepath="$PROJECT_DIR$/.idea/move-fast-and-dont-break-things.iml" />
+    </modules>
+  </component>
+</project>

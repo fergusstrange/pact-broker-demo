@@ -1,0 +1,18 @@
+version: '3'
+services:
+  web:
+    ports:
+      - 8000:80
+    image: dius/pact-broker
+    environment:
+      - PACT_BROKER_DATABASE_USERNAME=postgres
+      - PACT_BROKER_DATABASE_PASSWORD=postgres
+      - PACT_BROKER_DATABASE_HOST=postgres
+      - PACT_BROKER_DATABASE_NAME=postgres  
+  postgres:
+    image: postgres:9.4
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+    expose:
+      - 5432

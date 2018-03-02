@@ -1,0 +1,109 @@
+import org.apache.http.client.fluent.Request
+
+import java.util.concurrent.Callable
+
+import static java.util.Optional.ofNullable
+import static java.util.concurrent.Executors.newSingleThreadExecutor
+
+group 'fergy'
+
+buildscript {
+    dependencies {
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:1.5.8.RELEASE"
+        classpath "au.com.dius:pact-jvm-provider-gradle_2.11:3.5.8"
+        classpath "org.apache.httpcomponents:fluent-hc:4.5"
+    }
+    repositories {
+        mavenCentral()
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'au.com.dius.pact'
+
+group = 'fergy'
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+jar {
+    baseName = 'management-portal'
+}
+
+configurations {
+    compile.exclude module: 'spring-boot-starter-tomcat'
+}
+
+dependencies {
+    compile 'org.springframework.boot:spring-boot-starter-web:1.5.8.RELEASE'
+    compile 'org.springframework.boot:spring-boot-starter-actuator:1.5.8.RELEASE'
+    compile 'org.springframework.boot:spring-boot-starter-undertow:1.5.8.RELEASE'
+    compile 'io.github.openfeign:feign-core:9.5.1'
+    compile 'io.github.openfeign:feign-jackson:9.5.1'
+
+    compileOnly 'org.projectlombok:lombok:1.16.16'
+
+    testCompile 'org.assertj:assertj-core:3.6.2'
+    testCompile 'org.springframework.boot:spring-boot-starter-test:1.5.8.RELEASE'
+    testCompile 'au.com.dius:pact-jvm-consumer-junit_2.11:3.5.8'
+}
+
+test {
+    systemProperties['pact.rootDir'] = "$buildDir/pacts"
+}
+
+task startAppProcess(type: JavaExec, dependsOn: 'testClasses') {
+    systemProperty 'spring.profiles.active', 'service-stubbed'
+    classpath = sourceSets.test.runtimeClasspath
+    main = 'fergy.managementportaldata.Application'
+}
+
+task startApp {
+    doLast {
+        def executor = newSingleThreadExecutor()
+        executor.submit({ startAppProcess.execute() } as Callable)
+        def timeTaken = 0
+        while (timeTaken < 120) {
+            try {
+                if (Request.Get("http://localhost:8081/health").execute().returnResponse().getStatusLine().getStatusCode() == 200) {
+                    executor.shutdownNow()
+                    return
+                }
+            }
+            catch (ConnectException ignored) {
+            }
+            timeTaken++
+            sleep(500)
+        }
+        throw new GradleException("Failed to start app in 1 minute.")
+    }
+}
+
+task stopApp {
+    doLast {
+        Request.Post("http://localhost:8081/shutdown").execute()
+    }
+}
+
+pact {
+    serviceProviders {
+        managementPortalData {
+            if ('pactVerify' in gradle.startParameter.taskNames) {
+                startProviderTask = startApp
+                terminateProviderTask = stopApp
+                hasPactsFromPactBroker(ofNullable(System.env.PACT_BROKER_URL).orElse('http://foo:bar@localhost:8000'), authentication: ['basic', System.getenv("PACT_BROKER_USERNAME") ?: "foo", System.getenv("PACT_BROKER_PASSWORD") ?: "bar"])
+            }
+        }
+    }
+    publish {
+        version = 0
+        pactBrokerUrl = ofNullable(System.env.PACT_BROKER_URL).orElse('http://foo:bar@localhost:8000')
+    }
+    reports {
+        console
+        markdown
+    }
+}

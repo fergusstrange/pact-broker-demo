@@ -1,0 +1,14 @@
+management:
+  port: 8081
+  security:
+    enabled: false
+
+server:
+  context-path: /management-portal-api
+endpoints:
+  shutdown:
+    enabled: true
+    sensitive: false
+
+application:
+  customer-identity-base-url: http://customer-identity

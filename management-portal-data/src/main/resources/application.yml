@@ -1,0 +1,13 @@
+management:
+  port: 8081
+  security:
+    enabled: false
+
+server:
+  context-path: /management-portal-data-api
+endpoints:
+  shutdown:
+    enabled: true
+    sensitive: false
+
+application:
